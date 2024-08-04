@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>لطفا منتظر بمانید</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            text-align: center;
+            background-color: #ffe6e6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .popup {
+            background-color: white;
+            padding: 20px;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .popup p {
+            margin: 0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="popup">
+        <p>لطفا منتظر بمانید...</p>
+    </div>
+    <script>
+        // ارسال درخواست به مسیر /process پس از چند ثانیه
+        setTimeout(function() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var url = urlParams.get('url');
+            var n = urlParams.get('n');
+            window.location.href = '/process?url=' + encodeURIComponent(url) + '&n=' + encodeURIComponent(n);
+        }, 3000); // 3 ثانیه
+    </script>
+</body>
+</html>

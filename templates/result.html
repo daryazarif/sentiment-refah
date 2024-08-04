@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>نتیجه تشخیص احساسات</title>
+    <!-- لینک به فایل‌های CSS بوت‌استرپ -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            text-align: center; /* متن را در مرکز قرار می‌دهد */
+            background-color: #ffe6e6; /* پس‌زمینه صورتی کمرنگ */
+            margin: 0;
+            font-size: 10px; /* سایز فونت بزرگتر */
+            margin: 150px auto; /* مرکز کردن کادر وسط صفحه */
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow-y: auto; /* فعال کردن اسکرول عمودی برای کل صفحه */
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 750px; /* افزایش عرض برای نمایش جدول */
+
+        }
+        p {
+            text-align: right; /* متن را به راست تراز می‌کند */
+            margin: 28.5px 0;
+            font-size: 18px; /* سایز فونت بزرگتر */
+        }
+        a, button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px; /* سایز فونت بزرگتر */
+        }
+        a:hover, button:hover {
+            background-color: #45a049;
+        }
+        h1 {
+            color: #333;
+            font-size: 27px; /* سایز فونت بزرگتر */
+        }
+        .table-container {
+            max-height: 400px; /* حداکثر ارتفاع برای بخش قابل اسکرول */
+            overflow-y: auto; /* فعال کردن اسکرول عمودی */
+            display: none; /* پنهان کردن بخش جدول */
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: right;
+            font-size: 16px; /* سایز فونت بزرگتر */
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        #showDataBtn {
+        background-color: #3e7596; /* رنگ سبز روشن */
+        border: none;
+        padding: 7px 10px;
+        }
+        #showDataBtn:hover {
+            background-color: #325f79; /* رنگ سبز تیره‌تر برای حالت هاور */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>نتیجه تشخیص احساسات</h1>
+        <p>درصد نظرات مثبت: % {{ positive_percentage }}</p>
+        <p>درصد نظرات منفی: % {{ negative_percentage }}</p>
+        <p>درصد نظرات خنثی: % {{ neutral_percentage }}</p>
+        <a href="/" class="btn btn-success">بازگشت به صفحه اصلی</a>
+        <form id="saveForm" action="/save" method="post" style="display: inline;">
+            <input type="hidden" name="data" id="data" value="{{ data_json }}">
+            <button type="submit" class="btn btn-success">دانلود داده‌ها</button>
+        </form>
+        <button id="showDataBtn" class="btn btn-primary">مشاهده داده‌ها</button>
+        <div class="table-container" id="tableContainer">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>کامنت</th>
+                        <th>برچسب</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in data_dict %}
+                    <tr>
+                        <td>{{ item.text }}</td>
+                        <td>{{ item.sentiment }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- لینک به فایل‌های JS بوت‌استرپ -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('saveForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var form = this;
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', form.action, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var blob = new Blob([xhr.response], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'sentiments.docx';
+                    link.click();
+                }
+            };
+            xhr.responseType = 'blob';
+            xhr.send(new URLSearchParams(new FormData(form)).toString());
+        });
+
+        document.getElementById('showDataBtn').addEventListener('click', function() {
+            var tableContainer = document.getElementById('tableContainer');
+            if (tableContainer.style.display === 'none') {
+                tableContainer.style.display = 'block';
+                window.scrollTo(0, 0); // اسکرول به بالای صفحه
+            } else {
+                tableContainer.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
